@@ -1,2 +1,2 @@
- 0x0000000000000001 (NEEDED)             Shared library: [lib_custom_hbtn.so]
- 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+lib_custom_hbtn.so
+
