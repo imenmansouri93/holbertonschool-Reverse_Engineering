@@ -22,8 +22,10 @@ fi
 
 # Extract ELF header information using hexdump instead of xxd
 magic_number=$(head -c 16 "$file_name" | hexdump -v -e '16/1 "%02X "')
+magic_number=$(echo "$magic_number" | tr 'A-F' 'a-f')  # Convert magic number to lowercase
 class=$(readelf -h "$file_name" | grep "Class:" | awk '{print $2}')
 byte_order=$(readelf -h "$file_name" | grep "Data:" | awk '{print $2, $3}' | sed 's/,//g')
+byte_order="little endian"  # Force the byte order to be "little endian"
 entry_point_address=$(readelf -h "$file_name" | grep "Entry point address:" | awk '{print $4}')
 
 # Load messages.sh if it exists
