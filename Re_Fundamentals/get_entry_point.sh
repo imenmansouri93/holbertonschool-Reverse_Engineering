@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Vérifier si un fichier a été fourni en argument
+# Check if a file is provided as an argument
 if [ $# -ne 1 ]; then
     echo "Usage: $0 <ELF_file>"
     exit 1
@@ -8,31 +8,31 @@ fi
 
 file_name="$1"
 
-# Vérifier si le fichier existe
+# Check if the file exists
 if [ ! -f "$file_name" ]; then
     echo "Error: File '$file_name' not found!"
     exit 1
 fi
 
-# Vérifier si le fichier est un ELF valide en utilisant 'file'
+# Check if the file is a valid ELF file using 'file'
 if ! file "$file_name" | grep -q "ELF"; then
     echo "Error: '$file_name' is not a valid ELF file!"
     exit 1
 fi
 
-# Extraire les informations ELF
-magic_number=$(od -An -t x1 -j 0 -N 16 "$file_name" | tr -d ' \n' | sed 's/\(..\)/\1 /g' | sed 's/ $//')
+# Extract ELF header information
+magic_number=$(xxd -p -l 16 "$file_name" | awk '{for(i=1;i<=length;i+=2) printf "%s ", substr($0,i,2)}')
 class=$(readelf -h "$file_name" | grep "Class:" | awk '{print $2}')
-byte_order=$(readelf -h "$file_name" | grep "Data:" | awk '{print $2, $3}')
+byte_order=$(readelf -h "$file_name" | grep "Data:" | awk '{print $2, $3}' | sed 's/,//g')
 entry_point_address=$(readelf -h "$file_name" | grep "Entry point address:" | awk '{print $4}')
 
-# Charger messages.sh s'il existe
+# Load messages.sh if it exists
 if [ -f "./messages.sh" ]; then
     source ./messages.sh
-    # Appeler la fonction pour afficher les infos
+    # Call the function to display the info
     display_elf_header_info
 else
-    # Affichage direct si messages.sh est absent
+    # Direct output if messages.sh is absent
     echo "ELF Header Information for '$file_name':"
     echo "----------------------------------------"
     echo "Magic Number: $magic_number"
