@@ -20,8 +20,8 @@ if ! file "$file_name" | grep -q "ELF"; then
     exit 1
 fi
 
-# Extract ELF header information
-magic_number=$(xxd -p -l 16 "$file_name" | awk '{for(i=1;i<=length;i+=2) printf "%s ", substr($0,i,2)}')
+# Extract ELF header information using hexdump instead of xxd
+magic_number=$(head -c 16 "$file_name" | hexdump -v -e '16/1 "%02X "')
 class=$(readelf -h "$file_name" | grep "Class:" | awk '{print $2}')
 byte_order=$(readelf -h "$file_name" | grep "Data:" | awk '{print $2, $3}' | sed 's/,//g')
 entry_point_address=$(readelf -h "$file_name" | grep "Entry point address:" | awk '{print $4}')
