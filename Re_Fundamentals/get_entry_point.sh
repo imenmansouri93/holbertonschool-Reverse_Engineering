@@ -21,7 +21,7 @@ if ! file "$file_name" | grep -q "ELF"; then
 fi
 
 # Extraire les informations ELF
-magic_number=$(hexdump -n 16 -e '16/1 "%02x " "\n"' "$file_name" | tr -d ' \n')  # Magic Number complet
+magic_number=$(xxd -p -l 16 "$file_name" | sed 's/\(..\)/\1 /g' | sed 's/ $//')
 class=$(readelf -h "$file_name" | grep "Class:" | awk '{print $2}')
 byte_order=$(readelf -h "$file_name" | grep "Data:" | awk '{print $2, $3}')
 entry_point_address=$(readelf -h "$file_name" | grep "Entry point address:" | awk '{print $4}')
@@ -35,7 +35,7 @@ else
     # Affichage direct si messages.sh est absent
     echo "ELF Header Information for '$file_name':"
     echo "----------------------------------------"
-    echo "Magic Number:$magic_number"
+    echo "Magic Number: $magic_number"
     echo "Class: $class"
     echo "Byte Order: $byte_order"
     echo "Entry Point Address: $entry_point_address"
